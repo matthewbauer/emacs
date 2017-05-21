@@ -130,14 +130,6 @@ Lisp_Object Vlibrary_cache;
    on subsequent starts.  */
 bool initialized;
 
-#ifndef CANNOT_DUMP
-/* Set to true if this instance of Emacs might dump.  */
-# ifndef DOUG_LEA_MALLOC
-static
-# endif
-bool might_dump;
-#endif
-
 #ifdef DARWIN_OS
 extern void unexec_init_emacs_zone (void);
 #endif
@@ -713,8 +705,6 @@ main (int argc, char **argv)
     }
 
 #ifndef CANNOT_DUMP
-  might_dump = !initialized;
-
 # ifdef GNU_LINUX
   if (!initialized)
     {
