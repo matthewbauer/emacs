@@ -273,9 +273,12 @@
                        (reverse (nth 0 reverse-output)))
                   ;; GNUTLS_RND_NONCE should be good enough to ensure this.
                   (should-not (member (secure-hash 'sha384 actual-iv 0 ivsize) actual-ivlist))
-                  (when (consp iv)
+                  (cond
+                   ((stringp iv)
+                    (should (equal iv actual-iv)))
+                   ((consp iv)
                     (push (secure-hash 'sha384 actual-iv 0 ivsize) actual-ivlist)
-                    (gnutls-tests-message "IV list length: %d" (length actual-ivlist)))
+                    (gnutls-tests-message "IV list length: %d" (length actual-ivlist))))
 
                   (gnutls-tests-message "%s %S" cipher cplist)
                   (gnutls-tests-message "key %S IV %S input %S auth %S => hexdata %S and reverse %S" key iv input auth (encode-hex-string data) reverse)
