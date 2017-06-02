@@ -212,7 +212,8 @@ There are still a bunch of doc strings winding up in dumped.elc from
 various sources:
 
  - It appears that defcustom doc strings do not wind up in the DOC
-   file, and thus do wind up in dumped.elc.
+   file from files byte-compiled with lexical binding, and thus do
+   wind up in dumped.elc.
  - A doc string for isearch--state field pop-fun seems to still wind
    up in dumped.elc; it’s part of a list in the parameters of a
    byte-code object.  This appears to come from cl-defstruct, which
