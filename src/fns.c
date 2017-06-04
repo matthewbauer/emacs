@@ -4768,11 +4768,19 @@ extract_data_from_object (Lisp_Object spec,
   register struct buffer *bp;
   EMACS_INT temp;
 
-  Lisp_Object object        = Fnth (make_number (0), spec);
-  Lisp_Object start	    = Fnth (make_number (1), spec);
-  Lisp_Object end	    = Fnth (make_number (2), spec);
-  Lisp_Object coding_system = Fnth (make_number (3), spec);
-  Lisp_Object noerror	    = Fnth (make_number (4), spec);
+  Lisp_Object object        = XCAR (spec);
+
+  if (! NILP (spec)) spec = XCDR (spec);
+  Lisp_Object start	    = (CONSP (spec)) ? XCAR (spec) : Qnil;
+
+  if (! NILP (spec)) spec = XCDR (spec);
+  Lisp_Object end	    = (CONSP (spec)) ? XCAR (spec) : Qnil;
+
+  if (! NILP (spec)) spec = XCDR (spec);
+  Lisp_Object coding_system = (CONSP (spec)) ? XCAR (spec) : Qnil;
+
+  if (! NILP (spec)) spec = XCDR (spec);
+  Lisp_Object noerror	    = (CONSP (spec)) ? XCAR (spec) : Qnil;
 
   if (STRINGP (object))
     {
