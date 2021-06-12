@@ -4049,12 +4049,14 @@ DEFUN ("comp-el-to-eln-rel-filename", Fcomp_el_to_eln_rel_filename,
 
      As installing .eln files compiled during the build changes their
      absolute path we need an hashing mechanism that is not sensitive
-     to that.  For this we replace if match PATH_DUMPLOADSEARCH or
-     *PATH_REL_LOADSEARCH with '//' before computing the hash.  */
+     to that.  For this we replace if match PATH_DUMPLOADSEARCH,
+     PATH_REL_LOADSEARCH, or PATH_LOADSEARCH with '//' before
+     computing the hash.  */
 
   if (NILP (loadsearch_re_list))
     {
-      Lisp_Object sys_re =
+      Lisp_Object sys_abs_re = Fregexp_quote (build_string (PATH_LOADSEARCH "/"));
+      Lisp_Object sys_rel_re =
 	concat2 (build_string ("\\`[[:ascii:]]+"),
 		 Fregexp_quote (build_string ("/" PATH_REL_LOADSEARCH "/")));
       Lisp_Object dump_load_search =
@@ -4062,7 +4064,7 @@ DEFUN ("comp-el-to-eln-rel-filename", Fcomp_el_to_eln_rel_filename,
 #ifdef WINDOWSNT
       dump_load_search = Fw32_long_file_name (dump_load_search);
 #endif
-      loadsearch_re_list = list2 (sys_re, Fregexp_quote (dump_load_search));
+      loadsearch_re_list = list3 (sys_abs_re, sys_rel_re, Fregexp_quote (dump_load_search));
     }
 
   Lisp_Object lds_re_tail = loadsearch_re_list;
