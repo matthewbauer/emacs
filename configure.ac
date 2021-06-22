@@ -565,7 +565,7 @@ AC_ARG_ENABLE(checking,
 		 Flags are: stringbytes, stringoverrun, stringfreelist,
 		 structs, glyphs])],
 [ac_checking_flags="${enableval}"],[])
-IFS="${IFS= 	}"; ac_save_IFS="$IFS"; IFS="$IFS,"
+IFS="${IFS=     }"; ac_save_IFS="$IFS"; IFS="$IFS,"
 CHECK_STRUCTS=false
 for check in $ac_checking_flags
 do
@@ -1891,10 +1891,10 @@ if test "${with_ns}" != no; then
   # so avoid NS_IMPL_COCOA if macuvs.h is absent.
   # Even a headless Emacs can build macuvs.h, so this should let you bootstrap.
   if test "${opsys}" = darwin && test -f "$srcdir/src/macuvs.h"; then
-     lispdirrel=Contents/Resources/lisp
      NS_IMPL_COCOA=yes
      ns_appdir=`pwd`/nextstep/Emacs.app
      ns_appbindir=${ns_appdir}/Contents/MacOS
+     ns_applibdir=${ns_appdir}/Contents/MacOS/lib
      ns_appresdir=${ns_appdir}/Contents/Resources
      ns_appsrc=Cocoa/Emacs.base
      ns_fontfile=macfont.o
@@ -1952,6 +1952,7 @@ fail;
   if test $NS_IMPL_GNUSTEP = yes; then
      ns_appdir=`pwd`/nextstep/Emacs.app
      ns_appbindir=${ns_appdir}
+     ns_applibdir=${ns_appdir}/lib
      ns_appresdir=${ns_appdir}/Resources
      ns_appsrc=GNUstep/Emacs.base
      ns_fontfile=nsfont.o
@@ -2008,6 +2009,7 @@ if test "${HAVE_NS}" = yes; then
   window_system=nextstep
   # set up packaging dirs
   if test "${EN_NS_SELF_CONTAINED}" = yes; then
+     AC_DEFINE(NS_SELF_CONTAINED, 1, [Build an NS bundled app])
      ns_self_contained=yes
      prefix=${ns_appresdir}
      exec_prefix=${ns_appbindir}
@@ -2021,7 +2023,7 @@ if test "${HAVE_NS}" = yes; then
      infodir="\${ns_appresdir}/info"
      mandir="\${ns_appresdir}/man"
      lispdir="\${ns_appresdir}/lisp"
-     test "$locallisppathset" = no && locallisppath=""
+     test "$locallisppathset" = no && locallisppath="\${ns_appresdir}/site-lisp"
      INSTALL_ARCH_INDEP_EXTRA=
   fi
 
@@ -5409,6 +5411,8 @@ AC_SUBST(CFLAGS)
 AC_SUBST(X_TOOLKIT_TYPE)
 AC_SUBST(ns_appdir)
 AC_SUBST(ns_appbindir)
+AC_SUBST(ns_applibdir)
+AC_SUBST(ns_applibexecdir)
 AC_SUBST(ns_appresdir)
 AC_SUBST(ns_appsrc)
 AC_SUBST(GNU_OBJC_CFLAGS)
@@ -6009,10 +6013,13 @@ dnl the use of force in the 'epaths-force' rule in Makefile.in.
 AC_CONFIG_COMMANDS([src/epaths.h], [
 if test "${opsys}" = "mingw32"; then
   ${MAKE-make} MAKEFILE_NAME=do-not-make-Makefile epaths-force-w32
+elif test "$EN_NS_SELF_CONTAINED" = "yes"; then
+  ${MAKE-make} MAKEFILE_NAME=do-not-make-Makefile epaths-force-ns-self-contained
 else
   ${MAKE-make} MAKEFILE_NAME=do-not-make-Makefile epaths-force
 fi || AC_MSG_ERROR(['src/epaths.h' could not be made.])
-], [GCC="$GCC" CPPFLAGS="$CPPFLAGS" opsys="$opsys"])
+], [GCC="$GCC" CPPFLAGS="$CPPFLAGS" opsys="$opsys"
+    EN_NS_SELF_CONTAINED="$EN_NS_SELF_CONTAINED"])
 
 dnl NB we have to cheat and use the ac_... version because abs_top_srcdir
 dnl is not yet set, sigh.  Or we could use ../$srcdir/src/.gdbinit,
